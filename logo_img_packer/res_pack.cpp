@@ -52,6 +52,27 @@ static  const char* get_filename(const char *fpath)
 #endif
 }
 
+// added to filter out .bmp files
+static char* get_last_itemname(const char* itemName)
+{
+    char buf[256]={0};
+    char* last_itemname = (char*)malloc(256);
+
+    strcpy(last_itemname, itemName);
+    const char* bmp_tag = ".bmp";
+    const char* suffix_of_file;
+    suffix_of_file = strstr(itemName, bmp_tag);
+    int len = 0;
+
+    if (suffix_of_file && strcmp(suffix_of_file, bmp_tag) == 0)
+    {
+        len = suffix_of_file-itemName;
+        strncpy(buf, itemName, len);
+        buf[len] = '\0';
+        strcpy(last_itemname, buf);
+    }
+    return last_itemname;
+}
 
 int get_file_path_from_argv(const char** const argv, __hdle *hDir, char* fileName)
 {
@@ -494,9 +515,15 @@ static int _img_pack(const char** const path_src, const char* const packedImg,
                 pItemHeadInfo->index = itemIndex;
                 imageSz   += itemBodyOccupySz;
                 pItemHeadInfo->nums   = totalItemNum;
-                memcpy(pItemHeadInfo->name, itemName, strlen(itemName));
-                debugP("pack item [%s]\n", itemName);
-                ++pItemHeadInfo;//prepare for next item 
+
+                char* last_itemname = get_last_itemname(itemName);
+
+                memcpy(pItemHeadInfo->name, last_itemname, strlen(last_itemname));
+                debugP("pack item [%s]\n", last_itemname);
+                ++pItemHeadInfo;//prepare for next item
+                if (last_itemname != itemName) {
+                    free(last_itemname);
+                }
 
                 fd_src = fopen(filePath, "rb");
                 if(!fd_src){
