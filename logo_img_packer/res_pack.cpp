@@ -488,7 +488,7 @@ static int _img_pack(const char** const path_src, const char* const packedImg,
 
                 if(totalFileNum)//File list mode
                 {
-                        if((*getFile)(path_src, (__hdle*)itemIndex, filePath)) {
+                        if ((*getFile)(path_src, (__hdle*)(int64_t)itemIndex, filePath)) {
                                 break;
                         }
                 }
