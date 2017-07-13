@@ -1,4 +1,10 @@
 #!/bin/sh
+#/*
+# * Copyright (c) 2015 Amlogic, Inc. All rights reserved.
+# *
+# * This source code is subject to the terms and conditions defined in the
+# * file 'LICENSE' which is part of this source code package.
+# */
 
 emmc_partition_h=$1 #Header file of emmc_partition.h
 partInfoXml=$2
