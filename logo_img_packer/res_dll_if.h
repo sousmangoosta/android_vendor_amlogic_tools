@@ -1,4 +1,10 @@
 /*
+ * Copyright (c) 2015 Amlogic, Inc. All rights reserved.
+ *
+ * This source code is subject to the terms and conditions defined in the
+ * file 'LICENSE' which is part of this source code package.
+ */
+/*
  * \file        res_dll_if.h
  * \brief       This interfaces is included by user who use this dll
  *

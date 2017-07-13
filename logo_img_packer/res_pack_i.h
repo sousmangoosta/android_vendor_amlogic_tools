@@ -1,4 +1,10 @@
 /*
+ * Copyright (c) 2015 Amlogic, Inc. All rights reserved.
+ *
+ * This source code is subject to the terms and conditions defined in the
+ * file 'LICENSE' which is part of this source code package.
+ */
+/*
  * \file        res_pack_i.h
  * \brief       include file for res_pack
  *
