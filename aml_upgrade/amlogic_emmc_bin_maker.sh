@@ -1,10 +1,7 @@
 #!/bin/sh
-#/*
-# * Copyright (c) 2015 Amlogic, Inc. All rights reserved.
-# *
-# * This source code is subject to the terms and conditions defined in the
-# * file 'LICENSE' which is part of this source code package.
-# */
+#
+##V1.2 fix <aml_emmc_logic_table.xml> length can not support [a-fA-F]*
+####### change $unpackDir to temp dir, and del it if built successful
 
 emmc_partition_h=$1 #Header file of emmc_partition.h
 partInfoXml=$2
@@ -13,10 +10,10 @@ EmmcBin=$4
 SIMG2IMG=$5
 
 shellDir=$(cd `dirname $0`; pwd)
-DTB_PC=${shellDir}/dtb_pc
+
 UNPACKIMG=${shellDir}/aml_image_v2_packer
 unpackDir=`cd $(mktemp -d); pwd`
-
+DTB_PC=${shellDir}/dtb_pc
 
 if [ 4 -gt $# ]; then
     echo "Usage:[$0] emmc_partition_h partInfoXml AmlBurnPkg EmmcBin"
@@ -75,7 +72,8 @@ GAP_SZ_bootloader=`echo $tmpPartsSz | awk -F, '{print $6}'`
 GAP_SZ_logic=`echo $tmpPartsSz | awk -F, '{print $7}'`
 
 #Add one sector for bootloader
-bootloader="$unpackDir/bootloader.PARTITION"
+bootloader=$unpackDir/$(awk -v subtype="bootloader" -F[=\"] '$9 == subtype {print $3}' $unpackDir/image.cfg)
+echo "bootloader is $bootloader"
 if [ ! -f $bootloader ]; then
     echo "bootloader(${bootloader}) NOT existed"
     exit 1
@@ -137,12 +135,14 @@ do
 
      partOffsetInB=$Start
      partOffsetInMB=$((${partOffsetInB} / 1024 / 1024))
-     partSzInB=`echo $Length | sed -n 's/^\(0x\)\?\([0-9]\+\)$/\1\2/p'`
+     partSzInB=`echo $Length | sed -n 's/^\(0x\)\?\([0-9a-fA-F]\+\)$/\1\2/p'`
      if [ -z $partSzInB ]; then 
          printf "Line(%d) fmt err at Length(%s)\nPls copy length from /partitions of dts\n" $LineNo $Length
          break 1;
      fi
-     partSzInMB=$((${partSzInB} / 1024 / 1024))
+     #on 64-bit platform, donot need worry about bit63 treated sign bit, as it already biggest enough
+     #partSzInMB=$((${partSzInB} >> 20)) 
+     partSzInMB=`awk --non-decimal-data -v bytes="${partSzInB}" 'BEGIN{printf "0x%x", bytes / 1024 / 1024}'`
      printf "Cap of part(%s) is 0x%x(0x%xM)\n"  $partName $partSzInB $partSzInMB
      partSzInB=$((${partSzInB}))
 
@@ -186,5 +186,6 @@ if [ ! -f $EmmcBin ]; then
     exit 1
 fi
 targetFileSz=`du -b $EmmcBin | awk '{print $1}'`
-printf "\nSuccessful to generate %s, sz  0x%x(%dM)^^\n" $EmmcBin $targetFileSz $(($targetFileSz / 1024 /1024))
+printf "\nSuccessful to generate $%s, sz  0x%x(%dM)^^\n" $EmmcBin $targetFileSz $(($targetFileSz / 1024 /1024))
+rm -rf $unpackDir
 exit 0
