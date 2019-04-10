@@ -79,7 +79,7 @@ if [ ! -f $bootloader ]; then
     exit 1
 fi
 dd if=$bootloader of=${bootloader}.sdd seek=1 bs=512
-mv ${bootloader}.sdd $bootloader
+mv ${bootloader}.sdd $unpackDir/bootloader.PARTITION
 
 #dtb.img change to 512k
 dtbPart=${unpackDir}/_aml_dtb.PARTITION
