@@ -1,0 +1,19 @@
+/*cc_binary_host {
+  srcs: [
+    "res_pack.cpp",
+    "crc32.cpp",
+  ],
+  static_libs: ["libhost"],
+  local_include_dirs: ["build/libs/host/include"],
+  name: "logo_img_packer",
+}*/
+
+cc_binary {
+  srcs: [
+    "res_pack.cpp",
+    "crc32.cpp",
+  ],
+  host_supported: true,
+  proprietary: true,
+  name: "logo_img_packer",
+}
